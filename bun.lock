@@ -5,6 +5,7 @@
       "name": "streaming-web",
       "dependencies": {
         "@arcjet/bun": "^1.0.0-beta.1",
+        "@arcjet/node": "^1.0.0-beta.1",
         "@connectrpc/connect-web": "^1.4.0",
         "@types/express": "^4.17.21",
         "express": "^4.18.2",
@@ -23,6 +24,8 @@
 
     "@arcjet/analyze-wasm": ["@arcjet/analyze-wasm@1.0.0-beta.1", "", {}, "sha512-TRSDM2g+knkoDXDrmfEiAqXOctQ+fXha3JnpLgodKjFB3DRje+jnCxobkdxypWkyPj6V/2n0IftUaVOCWT8nmg=="],
 
+    "@arcjet/body": ["@arcjet/body@1.0.0-beta.1", "", {}, "sha512-0cRif9ylkSBbr341HB9MRGtm6SdPHjtvG/Wk1zQiWP0Ad3KYkSQ+zXtfhK7G7fcdKP1qA10gmTaSDJ0Vg+Ppxg=="],
+
     "@arcjet/bun": ["@arcjet/bun@1.0.0-beta.1", "", { "dependencies": { "@arcjet/env": "1.0.0-beta.1", "@arcjet/headers": "1.0.0-beta.1", "@arcjet/ip": "1.0.0-beta.1", "@arcjet/logger": "1.0.0-beta.1", "@arcjet/protocol": "1.0.0-beta.1", "@arcjet/transport": "1.0.0-beta.1", "arcjet": "1.0.0-beta.1" } }, "sha512-ViEDF62Z37k+Jwah+EOzXEn9pPqD2ZArPr/24RVxsdWFxklBfCI4dRBQQ6G6PZomPWmR1Lqo0n3Az7EqChDn9A=="],
 
     "@arcjet/duration": ["@arcjet/duration@1.0.0-beta.1", "", {}, "sha512-w+0apQrrs7g84rF8nfSeKdH2cbDxCmkJLYWNYmTOYkELyqDO1dn6kKKCxaXjyqLvX6gJdHdrX/YrxADuax1v4Q=="],
@@ -34,6 +37,8 @@
     "@arcjet/ip": ["@arcjet/ip@1.0.0-beta.1", "", {}, "sha512-hMR4ss/zodmmWfHNRvJTOekbJxcErGTZjQYq9W/bUsqEvjNCK4lK11GRp5r2OI3NaA8nXoZgkZKMG1EhNFf3uQ=="],
 
     "@arcjet/logger": ["@arcjet/logger@1.0.0-beta.1", "", { "dependencies": { "@arcjet/sprintf": "1.0.0-beta.1" } }, "sha512-5LREJwsAGIHWTiGDqMv/rWF9A0aQ94h9fznRbiv+uM3jaHR1mUrN3BF5PM27IgYmcxNeRsVEqmZx2F19hzbJrQ=="],
+
+    "@arcjet/node": ["@arcjet/node@1.0.0-beta.1", "", { "dependencies": { "@arcjet/body": "1.0.0-beta.1", "@arcjet/env": "1.0.0-beta.1", "@arcjet/headers": "1.0.0-beta.1", "@arcjet/ip": "1.0.0-beta.1", "@arcjet/logger": "1.0.0-beta.1", "@arcjet/protocol": "1.0.0-beta.1", "@arcjet/transport": "1.0.0-beta.1", "arcjet": "1.0.0-beta.1" } }, "sha512-tcY8flZwjLBVMy5lIFRIQX2SmFIwM/jE/h3AAe/pMEy5imMDPijI3B5sDl2QwgGFF/4xgYgNAO2qpSVNEL6kOw=="],
 
     "@arcjet/protocol": ["@arcjet/protocol@1.0.0-beta.1", "", { "dependencies": { "@bufbuild/protobuf": "1.10.0", "@connectrpc/connect": "1.6.1", "typeid-js": "1.1.0" } }, "sha512-e1P0Dqt9Rhm4bsnVp1vmReKB7n4zi7BHuSC3t4mj181FWqZP2LxBN5l5vJGyav9Aq1ts6SGkEBHjGXLc4Bq7Yg=="],
 
