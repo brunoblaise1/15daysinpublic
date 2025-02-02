@@ -42,8 +42,8 @@ function generateLeaderboardTable(users: user[]): string {
 
       return date[0]
         ? `${date.length > 1 ? `${date.length}` : "✓"} ${date[0].timestamp.getUTCHours()}:${date[0].timestamp.getUTCMinutes()}:${date[0].timestamp.getUTCSeconds()}`.padEnd(
-            dateLengths[index] + 2,
-          )
+          dateLengths[index] + 2,
+        )
         : " ".repeat(dateLengths[index] + 2);
     });
 
@@ -58,7 +58,6 @@ function generateLeaderboardTable(users: user[]): string {
     separatorRow,
   ].join("\n");
 }
-
 export async function getDaysLeaderboard(start: Date, end: Date) {
   const users: user[] = [];
 
@@ -96,11 +95,12 @@ export async function getDaysLeaderboard(start: Date, end: Date) {
       });
     }
   });
-
   // display the leaderboard in markdown format
-  const leaderboardFormatted = `# 15 Days in Public Leaderboard from ${start.toISOString().split("T")[0]} to ${end.toISOString().split("T")[0]}\n\nGood Luck and have fun!\nTime next to the checkmarks is given in h:m:s local time for that user🚀\nYou can find out specific details per user by going to /userid\n\n${generateLeaderboardTable(users)}\n`; //TODO: URl fix
-
-  return leaderboardFormatted;
+  if (users.length === 0) {
+    return `# 15 Days in Public Leaderboard from ${start.toISOString().split("T")[0]} to ${end.toISOString().split("T")[0]}\n\nGood Luck and have fun!\nTime next to the checkmarks is given in h:m:s local time for that user🚀\nYou can find out specific details per user by going to https://m.kieranklukas.com/s/10daysinpublic/userid\n\nNo data yet post something to appear here on slack and react with emoji of 10daysinpublic\n`;
+  } else {
+    return `# 15 Days in Public Leaderboard from ${start.toISOString().split("T")[0]} to ${end.toISOString().split("T")[0]}\n\nGood Luck and have fun!\nTime next to the checkmarks is given in h:m:s local time for that user🚀\nYou can find out specific details per user by going to https://m.kieranklukas.com/s/10daysinpublic/userid\n\n${generateLeaderboardTable(users)}\n`;
+  }
 }
 
 export async function getdaysDetailForUser(user: string) {
@@ -117,15 +117,15 @@ export async function getdaysDetailForUser(user: string) {
 
   return posts.length > 0
     ? `# ${user}\n` +
-        posts.map((post: any) => {
-          const timestampAdjusted = new Date();
-          timestampAdjusted.setTime(
-            (post.timestamp + post.user.timezoneOffset) * 1000,
-          );
+    posts.map((post: any) => {
+      const timestampAdjusted = new Date();
+      timestampAdjusted.setTime(
+        (post.timestamp + post.user.timezoneOffset) * 1000,
+      );
 
-          return `\n---\n${timestampAdjusted.toISOString().split("T")[0]} at ${timestampAdjusted.getUTCHours()}:${timestampAdjusted.getUTCMinutes()}:${timestampAdjusted.getUTCSeconds()} - ${post.text}`;
-        }) +
-        "\n---\n"
+      return `\n---\n${timestampAdjusted.toISOString().split("T")[0]} at ${timestampAdjusted.getUTCHours()}:${timestampAdjusted.getUTCMinutes()}:${timestampAdjusted.getUTCSeconds()} - ${post.text}`;
+    }) +
+    "\n---\n"
     : "No posts found for this user\n";
 }
 

@@ -49,8 +49,8 @@ app.get("/", async (req, res) => {
   }
   const leaderboard = await getDaysLeaderboard(
     //you can set your leaderboard to any days
-    new Date("2025-02-15"),
-    new Date("2025-02-30"),
+    new Date("2025-02-1"),
+    new Date("2025-02-2"),
   );
   streamData(req, res, leaderboard);
 });
@@ -69,9 +69,19 @@ app.get("/:user", async (req, res) => {
 
   streamData(req, res, userDetail);
 });
-
+let logger = (req: any, res: any, next: any) => {
+  let current_datetime = new Date();
+  let formatted_date = current_datetime.toISOString();
+  let method = req.method;
+  let url = req.url;
+  let status = res.statusCode;
+  let user_agent = req.headers["user-agent"];
+  let log = `\x1b[36m[${formatted_date}]\x1b[0m ${method}:${url} ${status} ${user_agent}`;
+  console.log(log); // Highlight log in cyan color
+};
 // Create server
 const server = http.createServer(app);
+server.on("request", logger);
 
 // Start server
 server.listen(port, () => {
