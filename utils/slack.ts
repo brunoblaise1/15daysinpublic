@@ -59,11 +59,11 @@ function generateLeaderboardTable(users: user[]): string {
   ].join("\n");
 }
 
-export async function get10DaysLeaderboard(start: Date, end: Date) {
+export async function getDaysLeaderboard(start: Date, end: Date) {
   const users: user[] = [];
 
   const response = await fetch(
-    "https://scrapbook.hackclub.com/api/r/10daysinpublic",
+    "https://scrapbook.hackclub.com/api/r/10daysinpublic", //this is reaction for 10days staying the same for fetching it
   );
 
   const posts = await response.json();
@@ -98,15 +98,16 @@ export async function get10DaysLeaderboard(start: Date, end: Date) {
   });
 
   // display the leaderboard in markdown format
-  const leaderboardFormatted = `# 10 Days in Public Leaderboard from ${start.toISOString().split("T")[0]} to ${end.toISOString().split("T")[0]}\n\nGood Luck and have fun!\nTime next to the checkmarks is given in h:m:s local time for that user🚀\nYou can find out specific details per user by going to https://m.kieranklukas.com/s/10daysinpublic/userid\n\n${generateLeaderboardTable(users)}\n`;
+  const leaderboardFormatted = `# 15 Days in Public Leaderboard from ${start.toISOString().split("T")[0]} to ${end.toISOString().split("T")[0]}\n\nGood Luck and have fun!\nTime next to the checkmarks is given in h:m:s local time for that user🚀\nYou can find out specific details per user by going to /userid\n\n${generateLeaderboardTable(users)}\n`; //TODO: URl fix
 
   return leaderboardFormatted;
 }
 
-export async function get10daysDetailForUser(user: string) {
+export async function getdaysDetailForUser(user: string) {
   const response = (
     await fetch("https://scrapbook.hackclub.com/api/r/10daysinpublic")
-  ).json();
+  ) //fetching using api
+    .json();
 
   const posts = (await response)
     .filter(
@@ -131,7 +132,7 @@ export async function get10daysDetailForUser(user: string) {
 export async function getSlackStatus() {
   // get slack status from the slack API
   const response = await fetch(
-    "https://slack.com/api/users.getPresence?user=U062UG485EE&pretty=1",
+    "https://slack.com/api/users.getPresence?user=U03T4CQ01RR&pretty=1",
     {
       headers: {
         Authorization: `Bearer ${process.env.SLACK_OAUTH_TOKEN}`,
