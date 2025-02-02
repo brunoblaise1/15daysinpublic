@@ -1,5 +1,7 @@
 import express from "express";
-import arcjet, { createRemoteClient, defaultBaseUrl } from "@arcjet/node";
+import arcjet, { createRemoteClient } from "@arcjet/node";
+
+import { baseUrl } from "@arcjet/env";
 import { createConnectTransport } from "@connectrpc/connect-web";
 import http from "http";
 import { streamData } from "./utils/streaming.ts";
@@ -9,13 +11,13 @@ const app = express();
 const port = 3000;
 
 const transport = createConnectTransport({
-  baseUrl: defaultBaseUrl(),
+  baseUrl: baseUrl(process.env),
   fetch,
 });
 
 const client = createRemoteClient({
   transport,
-  baseUrl: defaultBaseUrl(),
+  baseUrl: baseUrl(process.env),
   timeout: 500,
 });
 
