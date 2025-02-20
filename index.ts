@@ -52,7 +52,7 @@ app.get("/", async (req, res) => {
   const leaderboard = await getDaysLeaderboard(
     //you can set your leaderboard to any days
     new Date("2025-02-22"),
-    new Date("2024-03-9"),
+    new Date("2025-03-9"),
   );
   streamData(req, res, leaderboard);
 });
