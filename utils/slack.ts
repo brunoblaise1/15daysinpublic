@@ -97,9 +97,9 @@ export async function getDaysLeaderboard(start: Date, end: Date) {
   });
   // display the leaderboard in markdown format
   if (users.length === 0) {
-    return `# 15 Days in Public Leaderboard from ${start.toISOString().split("T")[0]} to ${end.toISOString().split("T")[0]}\n\nGood Luck and have fun!\nTime next to the checkmarks is given in h:m:s local time for that user🚀\nYou can find out specific details per user by going to https://m.kieranklukas.com/s/10daysinpublic/userid\n\nNo data yet post something to appear here on slack and react with emoji of 10daysinpublic\n`;
+    return `# 15 Days in Public Leaderboard from ${start.toISOString().split("T")[0]} to ${end.toISOString().split("T")[0]}\n\nGood Luck and have fun!\nTime next to the checkmarks is given in h:m:s local time for that user🚀\nYou can find out specific details per user by going to https://daysinpublic.blaisee.me/userid\n\nNo data yet post something to appear here on slack and react with emoji of 10daysinpublic\n`;
   } else {
-    return `# 15 Days in Public Leaderboard from ${start.toISOString().split("T")[0]} to ${end.toISOString().split("T")[0]}\n\nGood Luck and have fun!\nTime next to the checkmarks is given in h:m:s local time for that user🚀\nYou can find out specific details per user by going to https://m.kieranklukas.com/s/10daysinpublic/userid\n\n${generateLeaderboardTable(users)}\n`;
+    return `# 15 Days in Public Leaderboard from ${start.toISOString().split("T")[0]} to ${end.toISOString().split("T")[0]}\n\nGood Luck and have fun!\nTime next to the checkmarks is given in h:m:s local time for that user🚀\nYou can find out specific details per user by going to https://daysinpublic.blaisee.me/userid\n\n${generateLeaderboardTable(users)}\n`;
   }
 }
 
