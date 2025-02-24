@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 
 import GraphemeSplitter from "grapheme-splitter";
 
@@ -19,7 +19,12 @@ wrote: {bytes} bytes
 -------------------
 `;
 
-export function streamData(req: Request, res: Response, message: string, contentType: string = "text/plain") {
+export function streamData(
+  _req: Request,
+  res: Response,
+  message: string,
+  contentType = "text/plain",
+) {
   // get total bytes of message and replace {bytes} in transmissionEnd with the number of bytes of the message
   const body =
     transmissionStart.replace("{contentType}", contentType) +
@@ -29,7 +34,7 @@ export function streamData(req: Request, res: Response, message: string, content
   let delay = 0;
 
   // Send the body in chunks by letter with a variable delay
-  splitter.splitGraphemes(body).forEach((char) => {
+  for (const char of splitter.splitGraphemes(body)) {
     if (char === "🐢") {
       speed = 55;
     } else if (char === "🐇") {
@@ -37,14 +42,12 @@ export function streamData(req: Request, res: Response, message: string, content
     } else if (char === "🚀") {
       speed = 1;
     } else {
-      setTimeout(
-        () => {
-          res.write(char);
-        },
-        (delay += speed),
-      );
+      delay += speed;
+      setTimeout(() => {
+        res.write(char);
+      }, delay);
     }
-  });
+  }
 
   // Close the connection after sending the last chunk
   setTimeout(() => {

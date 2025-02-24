@@ -42,8 +42,8 @@ function generateLeaderboardTable(users: user[]): string {
 
       return date[0]
         ? `${date.length > 1 ? `${date.length}` : "✓"} ${date[0].timestamp.getUTCHours()}:${date[0].timestamp.getUTCMinutes()}:${date[0].timestamp.getUTCSeconds()}`.padEnd(
-          dateLengths[index] + 2,
-        )
+            dateLengths[index] + 2,
+          )
         : " ".repeat(dateLengths[index] + 2);
     });
 
@@ -65,9 +65,18 @@ export async function getDaysLeaderboard(start: Date, end: Date) {
     "https://scrapbook.hackclub.com/api/r/10daysinpublic", //this is reaction for 10days staying the same for fetching it
   );
 
-  const posts = await response.json();
+  interface Post {
+    timestamp: number;
+    text: string;
+    user: {
+      username: string;
+      timezoneOffset: number;
+    };
+  }
 
-  posts.forEach((post: any) => {
+  const posts = (await response.json()) as Post[];
+
+  for (const post of posts) {
     const timestampAdjusted = new Date();
     timestampAdjusted.setTime(
       (post.timestamp + post.user.timezoneOffset) * 1000,
@@ -77,7 +86,7 @@ export async function getDaysLeaderboard(start: Date, end: Date) {
       timestampAdjusted.getTime() < start.getTime() ||
       timestampAdjusted.getTime() > end.getTime()
     ) {
-      return;
+      continue;
     }
 
     // add user to the list if they don't exist
@@ -94,57 +103,44 @@ export async function getDaysLeaderboard(start: Date, end: Date) {
         content: post.text,
       });
     }
-  });
+  }
   // display the leaderboard in markdown format
   if (users.length === 0) {
     return `# 15 Days in Public Leaderboard from ${start.toISOString().split("T")[0]} to ${end.toISOString().split("T")[0]}\n\nGood Luck and have fun!\nTime next to the checkmarks is given in h:m:s local time for that user🚀\nYou can find out specific details per user by going to https://daysinpublic.blaisee.me/userid\n\nNo data yet post something to appear here on slack and react with emoji of 10daysinpublic\n`;
-  } else {
-    return `# 15 Days in Public Leaderboard from ${start.toISOString().split("T")[0]} to ${end.toISOString().split("T")[0]}\n\nGood Luck and have fun!\nTime next to the checkmarks is given in h:m:s local time for that user🚀\nYou can find out specific details per user by going to https://daysinpublic.blaisee.me/userid\n\n${generateLeaderboardTable(users)}\n`;
   }
+
+  return `# 15 Days in Public Leaderboard from ${start.toISOString().split("T")[0]} to ${end.toISOString().split("T")[0]}\n\nGood Luck and have fun!\nTime next to the checkmarks is given in h:m:s local time for that user🚀\nYou can find out specific details per user by going to https://daysinpublic.blaisee.me/userid\n\n${generateLeaderboardTable(users)}\n`;
 }
 
 export async function getdaysDetailForUser(user: string) {
-  const response = (
-    await fetch("https://scrapbook.hackclub.com/api/r/10daysinpublic")
-  ) //fetching using api
-    .json();
+  interface Post {
+    timestamp: number;
+    text: string;
+    user: {
+      username: string;
+      timezoneOffset: number;
+    };
+  }
 
-  const posts = (await response)
-    .filter(
-      (post: any) => post.user.username.toLowerCase() === user.toLowerCase(),
-    )
-    .sort((a: any, b: any) => a.timestamp - b.timestamp);
+  const response = await fetch(
+    "https://scrapbook.hackclub.com/api/r/10daysinpublic",
+  );
+  const data = (await response.json()) as Post[];
+
+  const posts = data
+    .filter((post) => post.user.username.toLowerCase() === user.toLowerCase())
+    .sort((a, b) => a.timestamp - b.timestamp);
 
   return posts.length > 0
-    ? `# ${user}\n` +
-    posts.map((post: any) => {
-      const timestampAdjusted = new Date();
-      timestampAdjusted.setTime(
-        (post.timestamp + post.user.timezoneOffset) * 1000,
-      );
+    ? `# ${user}\n${posts
+        .map((post) => {
+          const timestampAdjusted = new Date();
+          timestampAdjusted.setTime(
+            (post.timestamp + post.user.timezoneOffset) * 1000,
+          );
 
-      return `\n---\n${timestampAdjusted.toISOString().split("T")[0]} at ${timestampAdjusted.getUTCHours()}:${timestampAdjusted.getUTCMinutes()}:${timestampAdjusted.getUTCSeconds()} - ${post.text}`;
-    }) +
-    "\n---\n"
+          return `\n---\n${timestampAdjusted.toISOString().split("T")[0]} at ${timestampAdjusted.getUTCHours()}:${timestampAdjusted.getUTCMinutes()}:${timestampAdjusted.getUTCSeconds()} - ${post.text}`;
+        })
+        .join("")}\n---\n`
     : "No posts found for this user\n";
-}
-
-export async function getSlackStatus() {
-  // get slack status from the slack API
-  const response = await fetch(
-    "https://slack.com/api/users.getPresence?user=U03T4CQ01RR&pretty=1",
-    {
-      headers: {
-        Authorization: `Bearer ${process.env.SLACK_OAUTH_TOKEN}`,
-      },
-    },
-  );
-
-  const status = await response.json();
-
-  return status.presence === "active"
-    ? new Date().getHours() > 20 && new Date().getHours() < 8
-      ? "I'm currently listed as active on slack but i probably forgot to set myself not active :)"
-      : "I'm currently listed as active on slack :)"
-    : "I'm currently listed as not active on slack :( catch you later?";
 }
