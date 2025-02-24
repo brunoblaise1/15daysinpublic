@@ -1,30 +1,16 @@
 import express from "express";
-import arcjet, { createRemoteClient } from "@arcjet/node";
-
-import { baseUrl } from "@arcjet/env";
-import { createConnectTransport } from "@connectrpc/connect-web";
-import http from "http";
+import arcjet, { shield } from "@arcjet/bun";
+import { env } from "bun";
+import http from "node:http";
 import { streamData } from "./utils/streaming.ts";
 import { getDaysLeaderboard, getdaysDetailForUser } from "./utils/slack.ts";
 
 const app = express();
 const port = 3000;
 
-const transport = createConnectTransport({
-  baseUrl: baseUrl(process.env),
-  fetch,
-});
-
-const client = createRemoteClient({
-  transport,
-  baseUrl: baseUrl(process.env),
-  timeout: 500,
-});
-
 const aj = arcjet({
-  key: process.env.ARCJET_KEY!,
-  rules: [],
-  client,
+  key: env.ARCJET_KEY as string,
+  rules: [shield({ mode: "LIVE" })],
 });
 
 // Middleware to set Content-Type and enable streaming
@@ -71,15 +57,10 @@ app.get("/:user", async (req, res) => {
 
   streamData(req, res, userDetail);
 });
-let logger = (req: any, res: any, next: any) => {
-  let current_datetime = new Date();
-  let formatted_date = current_datetime.toISOString();
-  let method = req.method;
-  let url = req.url;
-  let status = res.statusCode;
-  let user_agent = req.headers["user-agent"];
-  let log = `\x1b[36m[${formatted_date}]\x1b[0m ${method}:${url} ${status} ${user_agent}`;
-  console.log(log); // Highlight log in cyan color
+const logger = (req: express.Request, res: express.Response) => {
+  console.log(
+    `\x1b[36m[${new Date().toISOString()}]\x1b[0m ${req.method}:${req.url} ${res.statusCode} ${req.headers["user-agent"]}`,
+  );
 };
 // Create server
 const server = http.createServer(app);
