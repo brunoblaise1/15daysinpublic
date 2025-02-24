@@ -31,16 +31,21 @@ export function streamData(
     message +
     transmissionEnd.replace("{bytes}", Buffer.byteLength(message).toString());
 
+  const chars = splitter.splitGraphemes(body);
+  const speedMultipliers = Math.exp(-chars.length / 1000) + 0.1;
+
   let delay = 0;
 
   // Send the body in chunks by letter with a variable delay
-  for (const char of splitter.splitGraphemes(body)) {
-    if (char === "🐢") {
-      speed = 55;
-    } else if (char === "🐇") {
-      speed = 5;
-    } else if (char === "🚀") {
-      speed = 1;
+  const speeds: Record<string, number> = {
+    "🐢": 45,
+    "🐇": 5 * speedMultipliers,
+    "🚀": 1 * speedMultipliers,
+  };
+
+  for (const char of chars) {
+    if (char in speeds) {
+      speed = speeds[char];
     } else {
       delay += speed;
       setTimeout(() => {
