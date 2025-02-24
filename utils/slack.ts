@@ -144,3 +144,48 @@ export async function getdaysDetailForUser(user: string) {
         .join("")}\n---\n`
     : "No posts found for this user\n";
 }
+
+interface Post {
+  timestamp: Date;
+  content: string;
+}
+
+export async function getJsonLeaderboard(): Promise<
+  { user: string; posts: { timestamp: number; content: string }[] }[]
+> {
+  const response = await fetch(
+    "https://scrapbook.hackclub.com/api/r/10daysinpublic",
+  );
+  interface Post {
+    timestamp: number;
+    text: string;
+    user: {
+      username: string;
+      timezoneOffset: number;
+    };
+  }
+  const data = (await response.json()) as Post[];
+
+  const users: { [key: string]: { timestamp: number; content: string }[] } = {};
+
+  for (const post of data) {
+    const timestampAdjusted = new Date();
+    timestampAdjusted.setTime(
+      (post.timestamp + post.user.timezoneOffset) * 1000,
+    );
+
+    if (!users[post.user.username]) {
+      users[post.user.username] = [];
+    }
+
+    users[post.user.username].push({
+      timestamp: timestampAdjusted.getTime(),
+      content: post.text,
+    });
+  }
+
+  return Object.entries(users).map(([username, posts]) => ({
+    user: username,
+    posts: posts,
+  }));
+}

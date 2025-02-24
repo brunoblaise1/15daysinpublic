@@ -3,10 +3,14 @@ import arcjet, { shield } from "@arcjet/node";
 import { env } from "bun";
 import http from "node:http";
 import { streamData } from "./utils/streaming.ts";
-import { getDaysLeaderboard, getdaysDetailForUser } from "./utils/slack.ts";
+import {
+  getDaysLeaderboard,
+  getdaysDetailForUser,
+  getJsonLeaderboard,
+} from "./utils/slack.ts";
 
 const app = express();
-const port = 3000;
+const port = 3001;
 
 const aj = arcjet({
   key: env.ARCJET_KEY as string,
@@ -43,12 +47,25 @@ app.use((req, res, next) => {
 
 // #daysinpublic leaderboard
 app.get("/", async (req, res) => {
-  const leaderboard = await getDaysLeaderboard(
-    //you can set your leaderboard to any days
-    new Date("2025-02-22"),
-    new Date("2025-03-9"),
-  );
-  streamData(req, res, leaderboard);
+  const userAgent = req.headers["user-agent"] as string;
+  const isBrowser =
+    userAgent.includes("Mozilla") ||
+    userAgent.includes("Chrome") ||
+    userAgent.includes("Safari") ||
+    userAgent.includes("Firefox") ||
+    userAgent.includes("MSIE");
+
+  if (!isBrowser || req.query.json === "true") {
+    const leaderboard = await getJsonLeaderboard();
+    res.json({ leaderboard });
+  } else {
+    const leaderboard = await getDaysLeaderboard(
+      //you can set your leaderboard to any days
+      new Date("2025-02-22"),
+      new Date("2025-03-9"),
+    );
+    streamData(req, res, leaderboard);
+  }
 });
 
 app.get("/:user", async (req, res) => {
@@ -58,6 +75,7 @@ app.get("/:user", async (req, res) => {
 
   streamData(req, res, userDetail);
 });
+
 const logger = (req: express.Request, res: express.Response) => {
   console.log(
     `\x1b[36m[${new Date().toISOString()}]\x1b[0m ${req.method}:${req.url} ${res.statusCode} ${req.headers["user-agent"]}`,
