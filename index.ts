@@ -1,5 +1,5 @@
 import express from "express";
-import arcjet, { shield } from "@arcjet/bun";
+import arcjet, { shield } from "@arcjet/node";
 import { env } from "bun";
 import http from "node:http";
 import { streamData } from "./utils/streaming.ts";
@@ -11,6 +11,20 @@ const port = 3000;
 const aj = arcjet({
   key: env.ARCJET_KEY as string,
   rules: [shield({ mode: "LIVE" })],
+});
+
+app.use(async (req, res, next) => {
+  const decision = await aj.protect(req);
+
+  // Check if the request is denied
+  if (decision.isDenied()) {
+    if (decision.reason.isRateLimit())
+      return res.status(429).json({ message: "Too many requests" });
+    return res.status(403).json({ message: "Access denied" });
+  }
+
+  // Call next middleware
+  next();
 });
 
 // Middleware to set Content-Type and enable streaming
@@ -29,12 +43,6 @@ app.use((req, res, next) => {
 
 // #daysinpublic leaderboard
 app.get("/", async (req, res) => {
-  const decision = await aj.protect(req);
-  if (decision.isDenied()) {
-    res.writeHead(429, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ error: "Too Many Requests" }));
-    return;
-  }
   const leaderboard = await getDaysLeaderboard(
     //you can set your leaderboard to any days
     new Date("2025-02-22"),
@@ -44,13 +52,6 @@ app.get("/", async (req, res) => {
 });
 
 app.get("/:user", async (req, res) => {
-  const decision = await aj.protect(req);
-  if (decision.isDenied()) {
-    res.writeHead(429, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ error: "Too Many Requests" }));
-    return;
-  }
-
   const userDetail = await getdaysDetailForUser(
     decodeURIComponent(req.params.user),
   );
